@@ -1,0 +1,40 @@
+.main-header{
+    background: rgba(219, 64, 64, 0.794);
+    padding: 8px 5px;
+}
+.main-header > div{
+    font-weight: bold;
+    display: inline-block;
+    font-size: x-large ;
+    color:rgb(235, 243, 233);
+}
+.main-nav-item{
+    display: inline-block;
+    margin: 0 5px;
+}
+.main-nav{
+    display: inline-block;
+    width: calc(100% - 255px)
+}
+.main-nav-item a {
+    text-decoration: none;
+    font-size:larger;
+    color:rgb(73, 4, 4);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+}
+.main-nav-item a:hover{
+    color:aliceblue
+}
+.main-nav-item a:active{
+    color:aliceblue
+}
+.auth{
+    float: right;
+    font-size: larger;
+}
+.active{
+    color:aliceblue
+}
+ul.link-wrapper  a.active {
+    color: white;
+}
