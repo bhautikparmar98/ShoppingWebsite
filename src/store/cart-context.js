@@ -2,7 +2,10 @@ import React from "react";
 
 let cartContext = React.createContext({
     cart:{},
-    addToCart:(item)=>{}
+    addToCart:(item)=>{},
+    deleteProduct:()=>{},
+    productforEdit:{},
+    setproductforEdit:(item)=>{}
 })
 
 export default cartContext

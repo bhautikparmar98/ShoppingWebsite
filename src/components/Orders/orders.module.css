@@ -1,0 +1,27 @@
+.orders{
+    margin:0;
+    padding: 0;
+}
+li{
+    list-style-type: none;
+    margin:0;
+    padding:0
+}
+.order-products{
+    padding: 0;
+}
+.order-items{
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.26);
+    margin-bottom: 1rem;
+    padding: 1rem;
+}
+.order-products-item{
+    border:1px solid #00695c;
+    color: #00695c;
+    margin: 0.5rem 0;
+    padding: 0.5rem
+}
+.loading{
+    text-align: center;
+    margin-top: 20px;
+}

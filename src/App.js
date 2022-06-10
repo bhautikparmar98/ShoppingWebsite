@@ -1,25 +1,28 @@
 import './App.css';
 import {Route, Routes} from 'react-router-dom'
-import React, {useReducer} from 'react';
+import React, {useReducer, useState} from 'react';
 import cartContext from './store/cart-context';
 import Cart from './components/Cart/Cart';
+import CheckoutSuccess from './components/Cart/checkout-success';
 import Header from './components/Header/Header';
 import Products from './components/Products/Products';
 import Orders from './components/Orders/orders'
 import AddProduct from './components/Add Product/AddProduct'
 import Auth from './components/Auth/Auth'
+import ResetAuth from './components/Auth/ResetAuth'
 
-
-function reducerFunc(state,action){
+const reducerFunc = (state,action)=>{
   const existingCartItemIndex = state.items.findIndex((item)=> item.id === action.body.id)
+  const existingCartItem = state.items[existingCartItemIndex]
   let updatedState
   let newState
-  if(existingCartItemIndex>=0){
-    updatedState={...state.items[existingCartItemIndex]}
-    updatedState.qty++
-    state.items[existingCartItemIndex]=updatedState
+  let updatedItems
+  if(existingCartItem){
+    updatedState={...existingCartItem, qty: existingCartItem.qty + 1}
+    updatedItems = [...state.items]
+    updatedItems[existingCartItemIndex]=updatedState
     newState = {
-      items:[...state.items],
+      items:updatedItems,
     }
   }else{
     updatedState={...action.body, qty:1 }
@@ -27,7 +30,6 @@ function reducerFunc(state,action){
       items:state.items.concat(updatedState),
     }
   }
-  console.log(newState)
   return newState
 }
 
@@ -35,74 +37,55 @@ function App() {
   const InitialCart ={
     items:[],
   }
+  const [authToken,setauthToken] = useState(sessionStorage.getItem('token'))
+
+  const [isAuth,setisAuth] = useState(authToken!==null && authToken!=='')
+
   //if some complex calculation needed while updating state then use useReducer isntead of useState
   let [CartDetail,dispatchFunc] = useReducer(reducerFunc,InitialCart)
+
   function AddToCart(item){
     dispatchFunc({type:"ADD",body:item})
   }
-  let products = [
-    {
-        id:'1',
-        title:"A Great Book",
-        imgUrl:"https://www.adazing.com/wp-content/uploads/2019/02/open-book-clipart-17-300x300.png",
-        price:99.9,
-        description:'A great Dummy Book'
-    },
-    {
-        id:'2',
-        title:"Another Book",
-        imgUrl:"https://static4.depositphotos.com/1011434/506/i/950/depositphotos_5066698-stock-photo-fredom.jpg",
-        price:200,
-        description:'A great Dummy Book'
-    },
-    {
-        id:'3',
-        title:"Another Book",
-        imgUrl:"https://www.adazing.com/wp-content/uploads/2019/02/open-book-clipart-17-300x300.png",
-        price:200,
-        description:'A great Dummy Book'
-    },
-    {
-        id:'4',
-        title:"Another Book",
-        imgUrl:"https://www.adazing.com/wp-content/uploads/2019/02/open-book-clipart-17-300x300.png",
-        price:200,
-        description:'A great Dummy Book'
-    },
-    {
-        id:'5',
-        title:"Another Book",
-        imgUrl:"https://www.adazing.com/wp-content/uploads/2019/02/open-book-clipart-17-300x300.png",
-        price:200,
-        description:'A great Dummy Book'
-    }
-]
+
+  const [productforEdit,setproductforEdit] = useState({})
+  const [ Timer, setTimer] = useState() 
   return (
   <React.Fragment>
-      <Header></Header>
+      <Header isAuth={isAuth} setisAuth={setisAuth}  Timer={Timer}></Header>
       <Routes>
         <Route path='/' element={
           <cartContext.Provider value={ {cart:CartDetail, addToCart:AddToCart} }>
-            <Products products={products}/>
+            <Products authToken={authToken}/>
           </cartContext.Provider>
         }/>
            
           <Route path='/cart' element={
             <cartContext.Provider value={ {cart:CartDetail, addToCart:AddToCart} }>
-              <Cart></Cart>
+              <Cart authToken={authToken} isAuth={isAuth}></Cart>
             </cartContext.Provider>
           }/>
         
-        <Route path='/orders' element={<Orders/>}/>
+        <Route path='/orders' element={<Orders  authToken={authToken}/>}/>
+        <Route path='/checkout/success' element={
+           <cartContext.Provider value={ {cart:CartDetail, addToCart:AddToCart} }>
+                <CheckoutSuccess CartDetail={CartDetail}/>
+            </cartContext.Provider>        
+        }/>
         
-        <Route path='/admin-products' element={
-          <cartContext.Provider value={ {cart:CartDetail} }>
-            <Products products={products}/>
+        <Route path='/update-products' element={
+          <cartContext.Provider value={ {cart:CartDetail,setproductforEdit:setproductforEdit} }>
+            <Products authToken={authToken}/>
           </cartContext.Provider>
         }/>
         
-        <Route path='/add-product' element={<AddProduct/>}/>
-        <Route path='/auth' element={<Auth/>}/>
+        <Route path='/add-product' element={
+          <cartContext.Provider value={{productforEdit:productforEdit}}>
+              <AddProduct/>
+          </cartContext.Provider>
+        }/>
+        <Route path='/auth/:authtype' element={<Auth setauthToken={setauthToken} setisAuth={setisAuth} setTimer={setTimer}/>}/>
+        <Route path='/reset-password' element={<ResetAuth />}/>
         <Route path='/*' element={<h1>404! Page Not Found</h1>}/>
       </Routes>
   </React.Fragment>
